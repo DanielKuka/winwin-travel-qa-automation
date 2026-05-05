@@ -42,10 +42,32 @@ export class GuestSelect extends BasePageObject {
     petWeightButton = this.page.locator('[data-wwt-id="guests-select__pet-weight--select"]');
 
     async open() {
-        await this.openButton.waitFor({state: 'visible', timeout: 15_000});
-        await this.openButton.click();
+        if (await this.adultsInput.isVisible().catch(() => false)) {
+            return;
+        }
 
-        await this.adultsInput.waitFor({state: 'visible', timeout: 15_000});
+        await this.openButton.waitFor({state: 'visible', timeout: 10_000});
+
+        for (let attempt = 1; attempt <= 3; attempt++) {
+            await this.openButton.scrollIntoViewIfNeeded();
+
+            if (attempt === 3) {
+                await this.openButton.click({force: true, timeout: 5_000});
+            } else {
+                await this.openButton.click({timeout: 5_000});
+            }
+
+            const isOpened = await this.adultsInput
+                .waitFor({state: 'visible', timeout: 5_000})
+                .then(() => true)
+                .catch(() => false);
+
+            if (isOpened) {
+                return;
+            }
+        }
+
+        throw new Error('Guests selector was not opened after 3 attempts');
     }
 
     async getAdultsCount() {
@@ -73,14 +95,6 @@ export class GuestSelect extends BasePageObject {
     async selectPetWeight(weight: DogWeightOption) {
         await this.petWeightButton.click();
         await this.page.getByRole('option', {name: weight, exact: true}).click();
-    }
-
-    async getPetTypeValue() {
-        return (await this.petTypeButton.textContent() ?? '').trim();
-    }
-
-    async getPetWeightValue() {
-        return (await this.petWeightButton.textContent() ?? '').trim();
     }
 
     async getPetTypeOptions() {
