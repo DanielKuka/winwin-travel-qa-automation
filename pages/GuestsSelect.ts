@@ -1,8 +1,8 @@
 import {BasePageObject} from '@pages/BasePageObject';
 import {Page} from '@playwright/test';
 
-export const MAX_ADULTS = 10;
 export const MIN_ADULTS = 1;
+export const MAX_ADULTS = 10;
 
 export const PET_TYPE_OPTIONS = ['Dog', 'Cat', 'Other'] as const;
 export type PetType = typeof PET_TYPE_OPTIONS[number];
@@ -15,27 +15,37 @@ export class GuestSelect extends BasePageObject {
         super(page, baseURL);
     }
 
-    openButton = this.page.locator('[data-wwt-id="guests-select__open--button"]').first();
-    modal = this.page.locator('[data-wwt-id="guests-select__mobile--modal"]');
-    confirmButton = this.page.locator('[data-wwt-id="guests-select__modal-confirm--button"]');
+    openButton = this.page
+        .locator('[data-wwt-id="guests-select__open--button"]')
+        .filter({visible: true})
+        .first();
 
-    // Adults counter
+    modal = this.page
+        .locator('[data-wwt-id="guests-select__mobile--modal"], [data-wwt-id="guests-select__desktop--modal"], [role="dialog"]')
+        .filter({visible: true})
+        .first();
+
+    confirmButton = this.page
+        .locator('[data-wwt-id="guests-select__modal-confirm--button"]')
+        .filter({visible: true})
+        .first();
+
     adultsSection = this.page.locator('[data-wwt-id="guests-select__adults-number--input"]');
     adultsInput = this.adultsSection.locator('[data-wwt-id="number-counter__input--input"]');
     adultsPlusButton = this.adultsSection.locator('[data-wwt-id="number-counter__plus--button"]');
     adultsMinusButton = this.adultsSection.locator('[data-wwt-id="number-counter__minus--button"]');
 
-    // Pets counter
     petsSection = this.page.locator('[data-wwt-id="guests-select__pets-number--input"]');
     petsPlusButton = this.petsSection.locator('[data-wwt-id="number-counter__plus--button"]');
 
-    // Pet type / weight selectors
     petTypeButton = this.page.locator('[data-wwt-id="guests-select__pet-type--select"]');
     petWeightButton = this.page.locator('[data-wwt-id="guests-select__pet-weight--select"]');
 
     async open() {
+        await this.openButton.waitFor({state: 'visible', timeout: 15_000});
         await this.openButton.click();
-        await this.modal.waitFor({state: 'visible', timeout: 15_000});
+
+        await this.adultsInput.waitFor({state: 'visible', timeout: 15_000});
     }
 
     async getAdultsCount() {
@@ -52,7 +62,7 @@ export class GuestSelect extends BasePageObject {
 
     async addPet() {
         await this.petsPlusButton.click();
-        await this.petTypeButton.waitFor({state: 'visible'});
+        await this.petTypeButton.waitFor({state: 'visible', timeout: 15_000});
     }
 
     async selectPetType(type: PetType) {

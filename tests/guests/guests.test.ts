@@ -8,9 +8,8 @@ test.describe('Guests selector', () => {
     });
 
     test.afterEach(async ({winWinSite}) => {
-        const isVisible = await winWinSite.guestSelect.modal.isVisible();
 
-        if (isVisible) {
+        if (await winWinSite.guestSelect.confirmButton.isVisible().catch(() => false)) {
             await winWinSite.guestSelect.confirmButton.click();
         }
     });
