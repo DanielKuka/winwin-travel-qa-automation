@@ -183,6 +183,16 @@ The HTML report is uploaded as an artifact (`playwright-report`) and retained fo
 
 ---
 
+## Logging and Reporting
+
+- Playwright list reporter is used for real-time console output.
+- Playwright HTML report is generated after test execution.
+- GitHub Actions logs are available for each CI run.
+- UI assertions are used to validate component states and behavior.
+- Network/API assertions are used to validate filter-related requests.
+
+---
+
 ## Manual Test Cases
 
 See [`docs/header-test-cases.md`](docs/header-test-cases.md).
